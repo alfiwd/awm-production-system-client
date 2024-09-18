@@ -689,24 +689,26 @@ export default {
             const { quantity, size, color, description, sample } = item,
               uploadResults = []
 
-            await Promise.all(
-              sample?.map(async (item) => {
-                const firebaseFolder = 'sample'
-                const imageRef = firebaseStorageRef(
-                  storage,
-                  `${firebaseFolder}/${item.name}-${Date.now()}`
-                )
+            if (sample) {
+              await Promise.all(
+                sample?.map(async (item) => {
+                  const firebaseFolder = 'sample'
+                  const imageRef = firebaseStorageRef(
+                    storage,
+                    `${firebaseFolder}/${item.name}-${Date.now()}`
+                  )
 
-                try {
-                  const response = await uploadBytes(imageRef, item.originFileObj)
-                  const imagePath = await getDownloadURL(response?.ref)
-                  uploadResults.push(imagePath)
-                } catch (error) {
-                  console.log('error upload sample => ', error)
-                  message.error(error?.response?.data?.message || 'Server error')
-                }
-              })
-            )
+                  try {
+                    const response = await uploadBytes(imageRef, item.originFileObj)
+                    const imagePath = await getDownloadURL(response?.ref)
+                    uploadResults.push(imagePath)
+                  } catch (error) {
+                    console.log('error upload sample => ', error)
+                    message.error(error?.response?.data?.message || 'Server error')
+                  }
+                })
+              )
+            }
 
             const createOrderPayload = {
               orderId: response.data.data.orderId,
