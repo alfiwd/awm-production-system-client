@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import Layout from '../components/organisms/Layout.vue'
 import Login from '../views/Login.vue'
-import OrderTracker from '../views/OrderTracker.vue'
 import Dashboard from '../views/Admin/Dashboard.vue'
 import CustomerDashboard from '../views/Admin/Customer/CustomerDashboard.vue'
 import CustomerDetail from '../views/Admin/Customer/CustomerDetail.vue'
@@ -18,11 +17,6 @@ const router = createRouter({
     {
       path: '/',
       redirect: '/login'
-    },
-    {
-      path: '/order-tracker',
-      name: 'Order Tracker',
-      component: OrderTracker
     },
     {
       path: '/login',

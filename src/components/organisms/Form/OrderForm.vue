@@ -186,13 +186,21 @@
     >
       <img alt="example" style="width: 100%" :src="state.previewImage" />
     </a-modal>
+    <a-modal
+      :visible="isConfirmModalVisible"
+      :title="confirmModalTitle"
+      @ok="handleConfirmModalOk"
+      @cancel="handleConfirmModalClose"
+    >
+      <p>{{ confirmModalContent }}</p>
+    </a-modal>
   </div>
 </template>
 
 <script>
 import { CheckOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { ref, reactive } from 'vue'
-import { Modal, message } from 'ant-design-vue'
+import { message } from 'ant-design-vue'
 import {
   ref as firebaseStorageRef,
   uploadBytes,
@@ -229,6 +237,7 @@ const state = reactive({
   previewFileName: null,
   previewImage: null
 })
+const isConfirmModalVisible = ref(false)
 
 export default {
   data(props) {
@@ -262,7 +271,12 @@ export default {
       orderStatus,
       role: null,
       sampleBeforeCreate: [],
-      sampleAfterCreate: []
+      sampleAfterCreate: [],
+      isConfirmModalVisible,
+      confirmModalTitle: '',
+      confirmModalContent: '',
+      orderDetailId: null,
+      status: null
     }
   },
 
@@ -331,6 +345,12 @@ export default {
   },
 
   methods: {
+    handleConfirmModalOk() {
+      this.fetchUpdateOrderDetailStatus(this.status, this.orderDetailId)
+    },
+    handleConfirmModalClose() {
+      isConfirmModalVisible.value = false
+    },
     getBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader()
@@ -381,6 +401,7 @@ export default {
           message.success(response?.data?.message || 'Berhasil mengubah status order detail')
           table_datas_ref.value = []
           this.fetchGetOrderByOrderId(this.orderId)
+          isConfirmModalVisible.value = false
         }
       } catch (error) {
         console.log('error => fetchUpdateOrderDetailStatus', error)
@@ -388,11 +409,11 @@ export default {
       }
     },
     handleOnStatusClick(status, orderDetailId) {
-      this.confirmModal(
-        () => this.fetchUpdateOrderDetailStatus(status, orderDetailId),
-        () => {},
-        status
-      )
+      isConfirmModalVisible.value = true
+      this.confirmModalTitle = `Apakah kamu ingin mengubah status detail order ini menjadi ${status}?`
+      this.confirmModalContent = 'Status yang sudah diubah tidak dapat dikembalikan.'
+      this.orderDetailId = orderDetailId
+      this.status = status
     },
     checkSubmitBtnDisabled() {
       table_datas_ref.value.length === 0 || this.areThereOrderDetails(table_datas_ref.value)
@@ -712,19 +733,6 @@ export default {
       } finally {
         this.isLoading = false
       }
-    },
-    confirmModal(okCb, cancelCb, title) {
-      Modal.confirm({
-        title: `Apakah kamu ingin mengubah status detail order ini menjadi ${title}?`,
-        content: 'Status yang sudah diubah tidak dapat dikembalikan.',
-        onOk() {
-          okCb()
-        },
-        onCancel() {
-          cancelCb()
-        },
-        class: 'test'
-      })
     }
   }
 }

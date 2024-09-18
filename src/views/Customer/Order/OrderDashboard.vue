@@ -140,11 +140,19 @@
     >
       <img alt="example" style="width: 100%" :src="previewImage" />
     </a-modal>
+    <a-modal
+      :visible="isConfirmModalVisible"
+      title="Batalkan pesanan"
+      @ok="handleConfirmModalOk"
+      @cancel="handleConfirmModalClose"
+    >
+      <p>{{ confirmModalContent }}</p>
+    </a-modal>
   </div>
 </template>
 <script>
 import { defineComponent, reactive, ref } from 'vue'
-import { Modal, message } from 'ant-design-vue'
+import { message } from 'ant-design-vue'
 import moment from 'moment'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import {
@@ -181,7 +189,8 @@ const state = reactive({
   open = ref(false),
   previewVisible = ref(false),
   previewImage = ref(''),
-  previewFileName = ref('')
+  previewFileName = ref(''),
+  isConfirmModalVisible = ref(false)
 
 export default defineComponent({
   mounted() {
@@ -219,11 +228,19 @@ export default defineComponent({
       orderStatusTransformer,
       formatRupiah,
       paymentType: null,
-      orderStatus
+      orderStatus,
+      isConfirmModalVisible,
+      confirmModalContent: ''
     }
   },
 
   methods: {
+    handleConfirmModalOk() {
+      this.fetchCancelOrder()
+    },
+    handleConfirmModalClose() {
+      isConfirmModalVisible.value = false
+    },
     handleSetActionButtonDisabled(status, buttonType) {
       const indexFound = this.orderStatus.findIndex((item) => item === status)
 
@@ -238,10 +255,7 @@ export default defineComponent({
         await updateOrderOnly(this.selectedOrderId, { status: 'CANCEL' })
       } catch (error) {
         console.log('error fetchCancelOrder => ', error)
-        this.errorModal(
-          error?.response?.data?.status || 'Error',
-          error?.response?.data?.message || 'Server error'
-        )
+        message.error(error?.response?.data?.message || 'Server error')
       } finally {
         this.handleSetTableDatas(null, 'GET_ALL')
         message.success('Pesanan berhasil dibatalkan')
@@ -249,11 +263,8 @@ export default defineComponent({
     },
     handleCancelOrder() {
       this.open = false
-      this.confirmModal(
-        () => this.fetchCancelOrder(),
-        () => {},
-        'Apakah kamu ingin membatalkan pesanan ini?'
-      )
+      isConfirmModalVisible.value = true
+      this.confirmModalContent = 'Apakah kamu ingin membatalkan pesanan ini?'
     },
     handleOpenPaymentModal(record, modalTitle, paymentType) {
       this.open = true
@@ -290,7 +301,7 @@ export default defineComponent({
         await updateStatusOrderDetail(orderDetailId, status)
       } catch (error) {
         console.log('error fetchUpdateOrderDetailStatus => ', error)
-        this.errorModal(error?.response?.data?.status, error?.response?.data?.message)
+        message.error(error?.response?.data?.message || 'Server error')
       }
     },
     async fetchUpdateOrderOnly(payload) {
@@ -309,10 +320,7 @@ export default defineComponent({
         await this.handleSetTableDatas(null, 'GET_ALL')
       } catch (error) {
         console.log('error fetchUpdateOrderOnly => ', error)
-        this.errorModal(
-          error?.response?.data?.status || 'Error',
-          error?.response?.data?.message || 'Server error'
-        )
+        message.error(error?.response?.data?.message || 'Server error')
       }
     },
     async handlePreview(file, title, newImage = true, key) {
@@ -384,10 +392,7 @@ export default defineComponent({
             })
             .catch((error) => {
               console.log('error handleOk => ', error)
-              this.errorModal(
-                error?.response?.data?.status || 'Error',
-                error?.response?.data?.message || 'Server error'
-              )
+              message.error(error?.response?.data?.message || 'Server error')
             })
             .finally(() => {
               this.state.isUploadFileLoading = false
@@ -440,10 +445,7 @@ export default defineComponent({
               })
               .catch((error) => {
                 console.log('error handleOk => ', error)
-                this.errorModal(
-                  error?.response?.data?.status || 'Error',
-                  error?.response?.data?.message || 'Server error'
-                )
+                message.error(error?.response?.data?.message || 'Server error')
               })
               .finally(() => {
                 this.state.isUploadFileLoading = false
@@ -454,10 +456,7 @@ export default defineComponent({
           })
           .catch((error) => {
             console.log('error handleOk (delete image) => ', error)
-            this.errorModal(
-              error?.response?.data?.status || 'Error',
-              error?.response?.data?.message || 'Server error'
-            )
+            message.error(error?.response?.data?.message || 'Server error')
             this.state.isUploadFileLoading = false
           })
       } else {
@@ -490,10 +489,7 @@ export default defineComponent({
           })
           .catch((error) => {
             console.log('error handleOk => ', error)
-            this.errorModal(
-              error?.response?.data?.status || 'Error',
-              error?.response?.data?.message || 'Server error'
-            )
+            message.error(error?.response?.data?.message || 'Server error')
           })
           .finally(() => {
             this.state.isUploadFileLoading = false
@@ -542,7 +538,7 @@ export default defineComponent({
         state[stateKey] = newArr
       } catch (error) {
         console.log(`error ${errorDesc} => `, error)
-        this.errorModal(error?.response?.data?.status, error?.response?.data?.message)
+        message.error(error?.response?.data?.message || 'Server error')
       }
     },
     async handleSetTableDatas(item, type) {
@@ -612,28 +608,10 @@ export default defineComponent({
         state.totalPrice = this.formatRupiah(totalPriceCounter(newArr))
       } catch (error) {
         console.log('error handleSetTableDatas => ', error)
-        this.errorModal(error?.response?.data?.status, error?.response?.data?.message)
+        message.error(error?.response?.data?.message || 'Server error')
       } finally {
         this.state.isLoading = false
       }
-    },
-    errorModal(title, content) {
-      Modal.error({
-        title,
-        content
-      })
-    },
-    confirmModal(okCb, cancelCb, title) {
-      Modal.confirm({
-        title,
-        onOk() {
-          okCb()
-        },
-        onCancel() {
-          cancelCb()
-        },
-        class: 'test'
-      })
     }
   }
 })
