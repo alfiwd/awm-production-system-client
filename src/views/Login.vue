@@ -242,9 +242,14 @@ export default {
       })
     },
     errorModal(title, content) {
+      console.log('errorModal muncul')
+
       Modal.error({
         title,
-        content
+        content,
+        onOk: () => {
+          console.log('ini ok')
+        }
       })
     }
   },
