@@ -120,7 +120,7 @@
 </template>
 
 <script>
-import { Modal, message } from 'ant-design-vue'
+import { message } from 'ant-design-vue'
 
 import { login, checkToken } from '../services/auth'
 import { addCustomer } from '../services/customer'
@@ -209,49 +209,25 @@ export default {
         this.$emit('handleLogin', false, '1')
       } catch (error) {
         console.log('error handleLogin => ', error)
-        // this.errorModal('Login gagal', error?.response?.data?.message)
-        message.error(error?.response?.data?.message)
+        message.error(error?.response?.data?.message || 'Login gagal')
       }
     },
     async handleRegister(values) {
       const validPhoneNumber = /^(08[1-9][0-9]{6,9}|(\+62|62)8[1-9][0-9]{6,9})$/
 
       if (!validPhoneNumber.test(values.phoneNumber)) {
-        Modal.error({
-          title: 'Nomor handphone tidak valid',
-          content: 'Masukkan nomor handphone yang valid'
-        })
+        message.error('Masukkan nomor handphone yang valid')
         return
       }
 
       const response = await addCustomer(values)
 
       response?.data?.status === 'Success'
-        ? this.successModal('Anda dapat melakukan login sekarang.')
-        : this.errorModal('Daftar gagal', response?.data?.message)
+        ? message.success('Anda dapat melakukan login sekarang.')
+        : message.error(response?.data?.message || 'Gagal melakukan pendaftaran')
     },
     onFinish(values) {
       this.isLoginForm ? this.handleLogin(values) : this.handleRegister(values)
-    },
-    successModal(content) {
-      Modal.success({
-        title: 'Berhasil melakukan pendaftaran',
-        content,
-        onOk: () => {
-          this.isLoginForm = true
-        }
-      })
-    },
-    errorModal(title, content) {
-      console.log('errorModal muncul')
-
-      Modal.error({
-        title,
-        content,
-        onOk: () => {
-          console.log('ini ok')
-        }
-      })
     }
   },
 

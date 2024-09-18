@@ -384,10 +384,7 @@ export default {
         }
       } catch (error) {
         console.log('error => fetchUpdateOrderDetailStatus', error)
-        this.errorModal(
-          error?.response?.data?.status || 'Failed',
-          error?.response?.data?.message || 'Server error'
-        )
+        message.error(error?.response?.data?.message || 'Server error')
       }
     },
     handleOnStatusClick(status, orderDetailId) {
@@ -540,7 +537,7 @@ export default {
         state[stateKey] = newArr
       } catch (error) {
         console.log(`error ${errorDesc} => `, error)
-        this.errorModal(error?.response?.data?.status, error?.response?.data?.message)
+        message.error(error?.response?.data?.message || 'Server error')
       }
     },
     async fetchGetOrderByOrderId(orderId) {
@@ -587,7 +584,7 @@ export default {
         }
       } catch (error) {
         console.log('error fetchGetOrderByOrderId => ', error)
-        this.errorModal(error?.response?.data?.status, error?.response?.data?.message)
+        message.error(error?.response?.data?.message || 'Server error')
       } finally {
         this.state.skeletonLoading = false
       }
@@ -619,10 +616,7 @@ export default {
                     uploadResults.push(imagePath)
                   } catch (error) {
                     console.log('error upload sample => ', error)
-                    this.errorModal(
-                      error?.response?.data?.status || 'Error',
-                      error?.response?.data?.message || 'Server error'
-                    )
+                    message.error(error?.response?.data?.message || 'Server error')
                   }
                 })
               )
@@ -657,10 +651,7 @@ export default {
         }
       } catch (error) {
         console.log('error => fetchUpdateOrder', error)
-        this.errorModal(
-          error?.response?.data?.status || 'Failed',
-          error?.response?.data?.message || error?.message || 'Server error'
-        )
+        message.error(error?.response?.data?.message || 'Server error')
       } finally {
         this.isLoading = false
       }
@@ -691,10 +682,7 @@ export default {
                   uploadResults.push(imagePath)
                 } catch (error) {
                   console.log('error upload sample => ', error)
-                  this.errorModal(
-                    error?.response?.data?.status || 'Error',
-                    error?.response?.data?.message || 'Server error'
-                  )
+                  message.error(error?.response?.data?.message || 'Server error')
                 }
               })
             )
@@ -716,20 +704,14 @@ export default {
           message.success(response?.data?.message)
           this.$router.push('/customer/order')
         } else {
-          this.errorModal(response?.data?.status, response?.data?.message)
+          message.error(response?.data?.message || 'Server error')
         }
       } catch (error) {
         console.log('error fetchCreateOrder => ', error)
-        this.errorModal(error?.response?.data?.status, error?.response?.data?.message)
+        message.error(error?.response?.data?.message || 'Server error')
       } finally {
         this.isLoading = false
       }
-    },
-    errorModal(title, content) {
-      Modal.error({
-        title,
-        content
-      })
     },
     confirmModal(okCb, cancelCb, title) {
       Modal.confirm({

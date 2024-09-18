@@ -43,9 +43,9 @@
 </template>
 
 <script>
-import { Modal } from 'ant-design-vue'
+import { message } from 'ant-design-vue'
 
-import { login, checkToken } from '../../services/auth'
+import { login } from '../../services/auth'
 
 export default {
   data() {
@@ -57,19 +57,6 @@ export default {
     }
   },
 
-  // async mounted() {
-  //   try {
-  //     const isThereToken = localStorage.getItem('accessToken')
-
-  //     if (isThereToken) {
-  //       await checkToken()
-  //       this.$router.push('/dashboard')
-  //     }
-  //   } catch (error) {
-  //     console.log('error => ', error)
-  //   }
-  // },
-
   methods: {
     async onFinish(values) {
       try {
@@ -80,14 +67,8 @@ export default {
         this.$router.push('/dashboard')
       } catch (error) {
         console.log('error => ', error)
-        this.errorModal(error?.response?.data?.message)
+        message.error(error?.response?.data?.message || 'Server error')
       }
-    },
-    errorModal(content) {
-      Modal.error({
-        title: 'Login gagal',
-        content
-      })
     }
   },
 

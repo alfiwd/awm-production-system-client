@@ -59,11 +59,10 @@ import {
   ReloadOutlined
 } from '@ant-design/icons-vue'
 import { defineComponent, ref } from 'vue'
-import { Modal } from 'ant-design-vue'
+import { message } from 'ant-design-vue'
 
 import { checkToken } from './../../services/auth'
 import breadcrumbs from './../../utils/breadcrumbs'
-import { roleStore } from '../../stores/role'
 
 export default defineComponent({
   components: {
@@ -98,7 +97,7 @@ export default defineComponent({
     } catch (error) {
       this.isLoginPage = true
       if (this.showErrorForMainMenu) {
-        this.errorModal(error?.response?.data?.message)
+        message.error(error?.response?.data?.message || 'Server error')
       }
       console.log('error Layout mounted => ', error)
       this.$router.push('/login')
@@ -223,12 +222,6 @@ export default defineComponent({
     },
     setBreadcrumbs(val) {
       this.breadcrumbs = breadcrumbs.find((item) => item.pathName === val)?.items
-    },
-    errorModal(content) {
-      Modal.error({
-        title: 'Server error',
-        content
-      })
     }
   },
 
