@@ -13,7 +13,7 @@ import ItemDashboard from '../views/Admin/Item/ItemDashboard.vue'
 import ItemDetail from '../views/Admin/Item/ItemDetail.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory('/'),
   routes: [
     {
       path: '/',
