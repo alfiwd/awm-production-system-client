@@ -120,7 +120,7 @@
 </template>
 
 <script>
-import { Modal } from 'ant-design-vue'
+import { Modal, message } from 'ant-design-vue'
 
 import { login, checkToken } from '../services/auth'
 import { addCustomer } from '../services/customer'
@@ -209,7 +209,8 @@ export default {
         this.$emit('handleLogin', false, '1')
       } catch (error) {
         console.log('error handleLogin => ', error)
-        this.errorModal('Login gagal', error?.response?.data?.message)
+        // this.errorModal('Login gagal', error?.response?.data?.message)
+        message.error(error?.response?.data?.message)
       }
     },
     async handleRegister(values) {
