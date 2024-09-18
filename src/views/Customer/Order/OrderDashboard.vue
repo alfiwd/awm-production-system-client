@@ -259,6 +259,7 @@ export default defineComponent({
       } finally {
         this.handleSetTableDatas(null, 'GET_ALL')
         message.success('Pesanan berhasil dibatalkan')
+        isConfirmModalVisible.value = false
       }
     },
     handleCancelOrder() {
